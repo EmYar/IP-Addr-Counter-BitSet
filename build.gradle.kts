@@ -1,5 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+val applicationDefaultXmx: String by project
+
 plugins {
     kotlin("jvm") version "1.5.31"
     application
@@ -20,6 +22,7 @@ dependencies {
 }
 
 tasks.test {
+    maxHeapSize = applicationDefaultXmx
     useJUnitPlatform()
 }
 
@@ -29,5 +32,5 @@ tasks.withType<KotlinCompile> {
 
 application {
     mainClass.set("me.emyar.MainKt")
-    applicationDefaultJvmArgs = listOf("-Xmx2g")
+    applicationDefaultJvmArgs = listOf("-Xmx$applicationDefaultXmx")
 }

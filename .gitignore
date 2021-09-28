@@ -1,11 +1,3 @@
-# Idea files
-.idea/modules
-.idea/shelf
-.idea/.name
-.idea/compiler.xml
-.idea/misc.xml
-.idea/workspace.xml
-
 # Gradle files
 .gradle
 
