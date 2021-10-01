@@ -38,7 +38,7 @@ private fun runMultiThread(inputFilePath: Path): Long = runBlocking {
     val ipStringChannel = Channel<Array<String?>>(channelsBufferSize)
     val ipIntChannel = Channel<UIntArray>(channelsBufferSize)
 
-    val storage = Ipv4Storage()
+    val storage = Ipv4Set()
 
     launch {
         Executors.newSingleThreadExecutor().asCoroutineDispatcher().use {
@@ -68,7 +68,7 @@ private fun runMultiThread(inputFilePath: Path): Long = runBlocking {
                 launch(it) {
                     Thread.currentThread().name = "Ip converter $i"
                     for (arrayStringIps in ipStringChannel)
-                        ipIntChannel.send(arrayStringIps.toIntIpsArray())
+                        ipIntChannel.send(arrayStringIps.mapNotNullToArray(String::toIpInt))
                 }
             }
             jobs.forEach { it.join() }
@@ -86,12 +86,14 @@ private fun runMultiThread(inputFilePath: Path): Long = runBlocking {
 }
 
 private fun runSingleThread(inputFilePath: Path): Long {
-    val storage = Ipv4Storage()
+    val storage = Ipv4Set()
 
-    inputFilePath.toFile().bufferedReader().lineSequence()
-        .forEach {
-            storage.add(it.storeIpAsInt())
-        }
+    inputFilePath.toFile().bufferedReader().use { reader ->
+        reader.lineSequence()
+            .forEach {
+                storage.add(it.toIpInt())
+            }
+    }
 
     return storage.uniqueIpsCount
 }
