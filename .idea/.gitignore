@@ -4,3 +4,5 @@ shelf
 compiler.xml
 misc.xml
 workspace.xml
+kotlinc.xml
+modules.xml
