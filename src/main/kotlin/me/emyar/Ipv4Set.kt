@@ -13,8 +13,10 @@ class Ipv4Set {
     @Suppress("PrivatePropertyName")
     private var ip255_255_255_255_isSet = false
 
-    private var _uniqueIpsCount = 0L
-    val uniqueIpsCount get() = _uniqueIpsCount
+    var uniqueIpsCount = 0L
+        private set
+
+    operator fun plusAssign(ip: UInt) = add(ip)
 
     fun add(ip: UInt) {
         when {
@@ -22,7 +24,7 @@ class Ipv4Set {
             ip <= secondStorageMaxIp -> addToBitSet(secondStorage, (ip - secondStorageIndexShift).toInt())
             ip == UInt.MAX_VALUE && !ip255_255_255_255_isSet -> {
                 ip255_255_255_255_isSet = true
-                _uniqueIpsCount++
+                uniqueIpsCount++
             }
         }
     }
@@ -30,7 +32,7 @@ class Ipv4Set {
     private fun addToBitSet(bitSet: BitSet, index: Int) {
         if (!bitSet[index]) {
             bitSet.set(index)
-            _uniqueIpsCount++
+            uniqueIpsCount++
         }
     }
 }

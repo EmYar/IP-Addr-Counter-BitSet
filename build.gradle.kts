@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val applicationDefaultXmx: String by project
 
 plugins {
-    kotlin("jvm") version "1.5.31"
+    kotlin("jvm") version "1.7.20"
     application
 }
 
@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
     testImplementation(kotlin("test"))
 }
@@ -26,7 +26,7 @@ tasks.test {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "16"
+    kotlinOptions.jvmTarget = "17"
 }
 
 application {

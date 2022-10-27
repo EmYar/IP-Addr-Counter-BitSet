@@ -79,7 +79,7 @@ private fun runMultiThread(inputFilePath: Path): Long = runBlocking {
     launch {
         for (ipArray in ipIntChannel)
             for (ipInt in ipArray)
-                storage.add(ipInt)
+                storage += ipInt
     }.join()
 
     storage.uniqueIpsCount
@@ -89,10 +89,7 @@ private fun runSingleThread(inputFilePath: Path): Long {
     val storage = Ipv4Set()
 
     inputFilePath.toFile().bufferedReader().use { reader ->
-        reader.lineSequence()
-            .forEach {
-                storage.add(it.toIpInt())
-            }
+        reader.forEachLine { storage += it.toIpInt() }
     }
 
     return storage.uniqueIpsCount
