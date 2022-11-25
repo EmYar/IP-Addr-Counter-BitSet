@@ -11,9 +11,15 @@ import kotlin.system.measureTimeMillis
 
 @ExperimentalUnsignedTypes
 fun main(args: Array<String>) {
-    val inputFilePath = args.getOrNull(0)?.let(Paths::get)
-        ?: Paths.get(System.getProperty("user.home"), "IP-Addr-Counter", "ip_addresses")
-    val multiThread = args.getOrNull(1)?.toBoolean() ?: true
+    val inputFilePath =
+        args.getOrNull(0)
+            ?.let(Paths::get)
+            ?: Paths.get(System.getProperty("user.home"), "IP-Addr-Counter", "ip_addresses")
+
+    val multiThread =
+        args.getOrNull(1)
+            ?.toBoolean()
+            ?: true
 
     println("File path: '$inputFilePath'")
     println("Multi thread: $multiThread")
