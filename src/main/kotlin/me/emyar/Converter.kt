@@ -1,29 +1,36 @@
 package me.emyar
 
-/**
- * This function is used instead of String#split because of performance: it does not allocate an array and skips
- * from 6 to 8 (depends on last byte length) characters when looking for dots
- */
+import java.text.CharacterIterator
+import java.text.StringCharacterIterator
+
 fun String.toIpInt(): UInt {
-    var currentResult = 0u
+    var result = 0u
+    var bitShift = 0
+    val iterator = StringCharacterIterator(this, this.length)
+    var digitNumber = 0
+    var currentNumber = 0
 
-    var byteStartPosition = 0
-    var dotsFound = 0
-    var bitShift = 24
-
-    var i = 1 // first char is always a digit
-    while (dotsFound < 3) {
-        val char = this[i]
-        if (char == '.') {
-            currentResult = currentResult or (substring(byteStartPosition, i).toUInt() shl bitShift)
-            byteStartPosition = i + 1
-            dotsFound++
-            bitShift -= 8
-            i += 2 // skip first character after found '.'
+    var ch = iterator.last();
+    while (ch != CharacterIterator.DONE) {
+        if (ch != '.') {
+            currentNumber += ch.digitToInt() multiplyBy10inPow digitNumber
+            digitNumber++
         } else {
-            i++
+            result = result or (currentNumber.toUInt() shl bitShift)
+            bitShift += 8
+            currentNumber = 0
+            digitNumber = 0
         }
+        ch = iterator.previous();
     }
 
-    return currentResult or substring(byteStartPosition, length).toUInt()
+    return result or (currentNumber.toUInt() shl bitShift)
 }
+
+private infix fun Int.multiplyBy10inPow(pow: Int) =
+    when (pow) {
+        0 -> this
+        1 -> this * 10
+        2 -> this * 100
+        else -> throw IllegalArgumentException()
+    }

@@ -1,6 +1,8 @@
 package me.emyar
 
 import java.util.*
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
 
 private val firstStorageMaxIp = Int.MAX_VALUE.toUInt()
 private val secondStorageMaxIp = firstStorageMaxIp * 2u
@@ -11,10 +13,11 @@ class Ipv4Set {
     private val secondStorage = BitSet(Int.MAX_VALUE)
 
     @Suppress("PrivatePropertyName")
-    private var ip255_255_255_255_isSet = false
+    private val ip255_255_255_255_isSet = AtomicBoolean()
 
-    var uniqueIpsCount = 0L
-        private set
+    private val _uniqueIpsCount = AtomicLong()
+    val uniqueIpsCount: Long
+        get() = _uniqueIpsCount.get()
 
     operator fun plusAssign(ip: UInt) = add(ip)
 
@@ -22,17 +25,25 @@ class Ipv4Set {
         when {
             ip <= firstStorageMaxIp -> addToBitSet(firstStorage, ip.toInt())
             ip <= secondStorageMaxIp -> addToBitSet(secondStorage, (ip - secondStorageIndexShift).toInt())
-            ip == UInt.MAX_VALUE && !ip255_255_255_255_isSet -> {
-                ip255_255_255_255_isSet = true
-                uniqueIpsCount++
+            ip == UInt.MAX_VALUE && !ip255_255_255_255_isSet.get() -> {
+                synchronized(this) {
+                    if (!ip255_255_255_255_isSet.get()) {
+                        ip255_255_255_255_isSet.set(true)
+                        _uniqueIpsCount.incrementAndGet()
+                    }
+                }
             }
         }
     }
 
     private fun addToBitSet(bitSet: BitSet, index: Int) {
         if (!bitSet[index]) {
-            bitSet.set(index)
-            uniqueIpsCount++
+            synchronized(bitSet) {
+                if (!bitSet[index]) {
+                    bitSet.set(index)
+                    _uniqueIpsCount.incrementAndGet()
+                }
+            }
         }
     }
 }
