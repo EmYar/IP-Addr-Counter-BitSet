@@ -13,15 +13,20 @@ fun main() {
     file.createNewFile()
 
     file.bufferedWriter().use { writer ->
-        val millionIps = LinkedHashSet<String>(1_000_000)
-        while (millionIps.size != 1_000_000) {
-            millionIps += Random.nextUInt(0u, 4_294_967_295u).toStringIp()
-        }
         repeat(5000) {
-            millionIps.forEach(writer::appendLine)
+            repeat(1_000_000) {
+                writer.appendLine(Random.nextUInt(0u, 4_294_967_295u).toStringIp())
+            }
         }
+//        val millionIps = LinkedHashSet<String>(1_000_000)
+//        while (millionIps.size != 1_000_000) {
+//            millionIps += Random.nextUInt(0u, 4_294_967_295u).toStringIp()
+//        }
+//        repeat(5000) {
+//            millionIps.forEach(writer::appendLine)
+//        }
     }
 }
 
-fun UInt.toStringIp(): String =
+private fun UInt.toStringIp(): String =
     "${this.shr(24) and 255u}.${this.shr(16) and 255u}.${this.shr(8) and 255u}.${this and 255u}"

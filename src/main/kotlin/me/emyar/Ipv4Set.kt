@@ -1,7 +1,6 @@
 package me.emyar
 
 import java.util.*
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
 
 private val firstStorageMaxIp = Int.MAX_VALUE.toUInt()
@@ -12,8 +11,8 @@ class Ipv4Set {
     private val firstStorage = BitSet(Int.MAX_VALUE)
     private val secondStorage = BitSet(Int.MAX_VALUE)
 
-    @Suppress("PrivatePropertyName")
-    private val ip255_255_255_255_isSet = AtomicBoolean()
+    @Volatile
+    private var isLastIpStored = false
 
     private val _uniqueIpsCount = AtomicLong()
     val uniqueIpsCount: Long
@@ -25,25 +24,33 @@ class Ipv4Set {
         when {
             ip <= firstStorageMaxIp -> addToBitSet(firstStorage, ip.toInt())
             ip <= secondStorageMaxIp -> addToBitSet(secondStorage, (ip - secondStorageIndexShift).toInt())
-            ip == UInt.MAX_VALUE && !ip255_255_255_255_isSet.get() -> {
-                synchronized(this) {
-                    if (!ip255_255_255_255_isSet.get()) {
-                        ip255_255_255_255_isSet.set(true)
-                        _uniqueIpsCount.incrementAndGet()
-                    }
-                }
-            }
+            ip == UInt.MAX_VALUE && !isLastIpStored -> saveLastIp()
         }
     }
 
     private fun addToBitSet(bitSet: BitSet, index: Int) {
         if (!bitSet[index]) {
-            synchronized(bitSet) {
+            val stateChanged = synchronized(bitSet) {
                 if (!bitSet[index]) {
                     bitSet.set(index)
-                    _uniqueIpsCount.incrementAndGet()
-                }
+                    true
+                } else
+                    false
             }
+            if (stateChanged)
+                _uniqueIpsCount.incrementAndGet()
         }
+    }
+
+    private fun saveLastIp() {
+        val stateChanged = synchronized(this) {
+            if (!isLastIpStored) {
+                isLastIpStored = true
+                true
+            } else
+                false
+        }
+        if (stateChanged)
+            _uniqueIpsCount.incrementAndGet()
     }
 }
