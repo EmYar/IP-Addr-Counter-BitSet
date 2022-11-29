@@ -21,7 +21,7 @@ class MultithreadingRun(
             newFixedThreadPoolContext(convertersNumber, "IpsConverter").use { convertersContext ->
                 newFixedThreadPoolContext(storageWorkersNumber, "StorageWorker").use { storageWorkersContext ->
                     inputFilePath.toFile().bufferedReader().use { reader ->
-                        val storage = Ipv4Set()
+                        val storage = ThreadSyncIpv4Set()
                         val ipStringChannel = launchFileReader(fileReaderContext, reader)
                         val ipIntChannel = launchConverters(convertersContext, ipStringChannel)
                         launchStorageWorkers(storageWorkersContext, ipIntChannel, storage)
@@ -62,7 +62,7 @@ class MultithreadingRun(
     private suspend fun launchStorageWorkers(
         storageWorkersContext: ExecutorCoroutineDispatcher,
         ipIntChannel: Channel<UIntArray>,
-        storage: Ipv4Set
+        storage: ThreadSyncIpv4Set
     ) =
         supervisorScope {
             launchAsyncMultipleAndAwait(storageWorkersContext, storageWorkersNumber) {

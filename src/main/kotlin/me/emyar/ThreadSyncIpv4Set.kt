@@ -7,7 +7,7 @@ private val firstStorageMaxIp = Int.MAX_VALUE.toUInt()
 private val secondStorageMaxIp = firstStorageMaxIp * 2u
 private val secondStorageIndexShift = firstStorageMaxIp.inc()
 
-class Ipv4Set {
+class ThreadSyncIpv4Set {
     private val firstStorage = BitSet(Int.MAX_VALUE)
     private val secondStorage = BitSet(Int.MAX_VALUE)
 
@@ -24,18 +24,18 @@ class Ipv4Set {
         when {
             ip <= firstStorageMaxIp -> addToBitSet(firstStorage, ip.toInt())
             ip <= secondStorageMaxIp -> addToBitSet(secondStorage, (ip - secondStorageIndexShift).toInt())
-            ip == UInt.MAX_VALUE && !isLastIpStored -> saveLastIp()
+            ip == UInt.MAX_VALUE -> saveLastIp()
         }
     }
 
     private fun addToBitSet(bitSet: BitSet, index: Int) {
         if (!bitSet[index]) {
-            val stateChanged = synchronized(bitSet) {
+            var stateChanged = false
+            synchronized(bitSet) {
                 if (!bitSet[index]) {
                     bitSet.set(index)
-                    true
-                } else
-                    false
+                    stateChanged = true
+                }
             }
             if (stateChanged)
                 _uniqueIpsCount.incrementAndGet()
@@ -43,14 +43,16 @@ class Ipv4Set {
     }
 
     private fun saveLastIp() {
-        val stateChanged = synchronized(this) {
-            if (!isLastIpStored) {
-                isLastIpStored = true
-                true
-            } else
-                false
+        if (!isLastIpStored) {
+            var stateChanged = false
+            synchronized(this) {
+                if (!isLastIpStored) {
+                    isLastIpStored = true
+                    stateChanged = true
+                }
+            }
+            if (stateChanged)
+                _uniqueIpsCount.incrementAndGet()
         }
-        if (stateChanged)
-            _uniqueIpsCount.incrementAndGet()
     }
 }

@@ -34,7 +34,7 @@ fun main(args: Array<String>) {
 }
 
 private fun runSingleThread(inputFilePath: Path): Long {
-    val storage = Ipv4Set()
+    val storage = ThreadSyncIpv4Set()
 
     inputFilePath.toFile().bufferedReader().use { reader ->
         reader.forEachLine { storage += it.toIpInt() }
