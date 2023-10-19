@@ -1,6 +1,8 @@
 # IP-Addr-Counter
 
-- Requires Java 17
+- Requires Java 20
 - Arguments:
-  - File path. Default is '~/IP-Addr-Counter/ip_addresses'
   - Multi thread support. Default is 'true'
+  - File path. Default is '~/IP-Addr-Counter/ip_addresses'
+
+To create a test file, use the main method in IpsGenerator.kt.

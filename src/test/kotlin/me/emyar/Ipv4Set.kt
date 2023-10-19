@@ -1,4 +1,5 @@
-import me.emyar.ThreadSyncIpv4Set
+package me.emyar
+
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import kotlin.test.assertEquals
@@ -8,7 +9,7 @@ class Ipv4Set {
     @Test
     fun add() {
         assertDoesNotThrow {
-            ThreadSyncIpv4Set().apply {
+            Storage().apply {
                 add(ip192_168_0_0)
                 add(ip192_168_0_0)
                 add(ip192_168_0_1)
@@ -21,7 +22,7 @@ class Ipv4Set {
 
     @Test
     fun getUniqueIpsCount() {
-        val storage = ThreadSyncIpv4Set().apply {
+        val storage = Storage().apply {
             add(ip192_168_0_0)
             add(ip192_168_0_0)
             add(ip192_168_0_1)

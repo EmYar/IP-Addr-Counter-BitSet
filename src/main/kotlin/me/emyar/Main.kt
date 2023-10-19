@@ -1,44 +1,32 @@
 package me.emyar
 
-import java.nio.file.Path
+import me.emyar.runners.MultithreadingRun
+import me.emyar.runners.SingleThreadRun
 import java.nio.file.Paths
 import kotlin.system.measureTimeMillis
 
-@ExperimentalUnsignedTypes
 fun main(args: Array<String>) {
-    val inputFilePath =
-        args.getOrNull(0)
-            ?.let(Paths::get)
-            ?: Paths.get(System.getProperty("user.home"), "IP-Addr-Counter", "ip_addresses")
-
     val multiThread =
-        args.getOrNull(1)
+        args.getOrNull(0)
             ?.toBoolean()
             ?: true
 
-    println("File path: '$inputFilePath'")
+    val inputFilePath =
+        args.getOrNull(1)
+            ?.let(Paths::get)
+            ?: Paths.get(System.getProperty("user.home"), "IP-Addr-Counter", "ip_addresses")
+
     println("Multi thread: $multiThread")
+    println("File path: '$inputFilePath'")
+
+    val runner = when (multiThread) {
+        true -> MultithreadingRun(inputFilePath)
+        false -> SingleThreadRun(inputFilePath)
+    }
 
     val uniqueIpsCount: Long
-    val timeMs = measureTimeMillis {
-        uniqueIpsCount =
-            if (multiThread)
-                MultithreadingRun(inputFilePath)
-                    .run()
-            else
-                runSingleThread(inputFilePath)
-    }
+    val timeMs = measureTimeMillis { uniqueIpsCount = runner.run() }
 
     println("Unique IPs count: $uniqueIpsCount")
-    println("Complete in: ${timeMs / 3600_000}h ${timeMs / 60_000}m ${timeMs / 1000 % 60}s")
-}
-
-private fun runSingleThread(inputFilePath: Path): Long {
-    val storage = ThreadSyncIpv4Set()
-
-    inputFilePath.toFile().bufferedReader().use { reader ->
-        reader.forEachLine { storage += it.toIpInt() }
-    }
-
-    return storage.uniqueIpsCount
+    printMeasuredTime("Complete in", timeMs)
 }

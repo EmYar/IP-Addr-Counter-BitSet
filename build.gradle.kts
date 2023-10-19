@@ -1,35 +1,33 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 val applicationDefaultXmx: String by project
 
 plugins {
-    kotlin("jvm") version "1.7.20"
+    kotlin("jvm") version "1.9.10"
     application
 }
 
 group = "me.emyar"
-version = "1.0-SNAPSHOT"
+version = "2.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
 }
 
+kotlin {
+    jvmToolchain(20)
+}
+
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 
     testImplementation(kotlin("test"))
+}
+
+application {
+    mainClass.set("me.emyar.MainKt")
+    applicationDefaultJvmArgs = listOf("-Xmx$applicationDefaultXmx", "-XX:+UseParallelGC")
 }
 
 tasks.test {
     maxHeapSize = applicationDefaultXmx
     useJUnitPlatform()
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
-}
-
-application {
-    mainClass.set("me.emyar.MainKt")
-    applicationDefaultJvmArgs = listOf("-Xmx$applicationDefaultXmx")
 }
