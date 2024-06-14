@@ -1,7 +1,7 @@
 val applicationDefaultXmx: String by project
 
 plugins {
-    kotlin("jvm") version "1.9.10"
+    kotlin("jvm") version "2.0.0"
     application
 }
 
@@ -13,11 +13,11 @@ repositories {
 }
 
 kotlin {
-    jvmToolchain(20)
+    jvmToolchain(21)
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0-RC")
 
     testImplementation(kotlin("test"))
 }
@@ -27,7 +27,13 @@ application {
     applicationDefaultJvmArgs = listOf("-Xmx$applicationDefaultXmx", "-XX:+UseParallelGC")
 }
 
-tasks.test {
-    maxHeapSize = applicationDefaultXmx
-    useJUnitPlatform()
+tasks {
+    wrapper {
+        version = 8.8
+    }
+
+    test {
+        maxHeapSize = applicationDefaultXmx
+        useJUnitPlatform()
+    }
 }
