@@ -4,7 +4,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.attribute.BasicFileAttributes
 import kotlin.random.Random
-import kotlin.system.measureTimeMillis
+import kotlin.time.measureTime
 
 private const val UNIQUE_IPS_BATCH_SIZE: Long = 10_000_000
 private const val BATCHES_COUNT = 400
@@ -28,14 +28,14 @@ fun main() {
 
     val storage = Storage()
 
-    val timeToGenerateIps = measureTimeMillis {
+    val timeToGenerateIps = measureTime {
         while (storage.uniqueIpsCount < UNIQUE_IPS_BATCH_SIZE) {
             storage += Random.nextInt()
         }
     }
-    printMeasuredTime("$UNIQUE_IPS_BATCH_SIZE unique IPs generated in", timeToGenerateIps)
+    println("$UNIQUE_IPS_BATCH_SIZE unique IPs generated in $timeToGenerateIps")
 
-    val timeToWriteFile = measureTimeMillis {
+    val timeToWriteFile = measureTime {
         file.bufferedWriter().use { writer ->
             repeat(BATCHES_COUNT) {
                 storage.stream()
@@ -46,8 +46,5 @@ fun main() {
 
     val fileAttributes = Files.readAttributes(file.toPath(), BasicFileAttributes::class.java)
     val fileSizeMb = fileAttributes.size() / 1024 / 1024
-    printMeasuredTime(
-        "File with ${UNIQUE_IPS_BATCH_SIZE * BATCHES_COUNT} IPs and ${fileSizeMb}mb generated in",
-        timeToWriteFile
-    )
+    println("File with ${UNIQUE_IPS_BATCH_SIZE * BATCHES_COUNT} IPs and ${fileSizeMb}mb generated in $timeToWriteFile")
 }

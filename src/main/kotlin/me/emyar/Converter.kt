@@ -35,4 +35,4 @@ private fun String.getInt(startIndex: Int, endIndex: Int = this.length): Int =
     }
 
 fun Int.toStringIp(): String =
-    "${this.shr(24) and 255}.${this.shr(16) and 255}.${this.shr(8) and 255}.${this and 255}"
+    "${(this shr 24) and 255}.${(this shr 16) and 255}.${(this shr 8) and 255}.${this and 255}"

@@ -2,16 +2,14 @@ package me.emyar.runners
 
 import me.emyar.Storage
 import me.emyar.toIpInt
-import java.nio.file.Path
+import java.io.File
 
-class SingleThreadRun(private val inputFilePath: Path) : Runner {
+class SingleThreadRun(private val inputFile: File) : Runner {
 
     override fun run(): Long {
         val storage = Storage()
 
-        inputFilePath.toFile().bufferedReader().use { reader ->
-            reader.forEachLine { storage += it.toIpInt() }
-        }
+        inputFile.forEachLine { storage += it.toIpInt() }
 
         return storage.uniqueIpsCount
     }
