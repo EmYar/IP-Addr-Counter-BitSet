@@ -1,7 +1,7 @@
 val applicationDefaultXmx: String by project
 
 plugins {
-    kotlin("jvm") version "2.0.0"
+    kotlin("jvm") version "2.0.21"
     application
 }
 
@@ -17,7 +17,7 @@ kotlin {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0-RC")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
 
     testImplementation(kotlin("test"))
 }
@@ -29,7 +29,7 @@ application {
 
 tasks {
     wrapper {
-        version = 8.8
+        gradleVersion = "8.10.2"
     }
 
     test {
